@@ -1,0 +1,7 @@
+{
+	"using_IE": [
+		"You appear to be using Internet Explorer, or some variation thereof.",
+		"VAULT uses advanced modern CSS and JavaScript techniques that current implementations of Internet Explorer cannot render correctly.",
+		"Consider using a browser such as <a href=\"https://www.google.com/chrome\">Chrome</a> or <a href=\"http://getfirefox.com\">Firefox</a>."
+	]
+}
