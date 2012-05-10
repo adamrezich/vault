@@ -3,5 +3,9 @@
 		"You appear to be using Internet Explorer, or some variation thereof.",
 		"VAULT uses advanced modern CSS and JavaScript techniques that current implementations of Internet Explorer cannot render correctly.",
 		"Consider using a browser such as <a href=\"https://www.google.com/chrome\">Chrome</a> or <a href=\"http://getfirefox.com\">Firefox</a>."
+	],
+	"viewport_too_small": [
+		"VAULT requires the displayable region of your browser window to be at least 960x720 pixels.",
+		"Please resize your window so that the dark gray box in the center of the window is completely visible against the black background."
 	]
 }

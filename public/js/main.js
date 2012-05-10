@@ -1,12 +1,11 @@
+i18n_loading = 'Loading...';
 i18n_loaded = false;
 i18n = {};
-i18n.loading_i18n = 'Loading...';
-
-
 
 activeOverlayMessage = null;
 
 $(document).ready(function () {
+	resize_overlay();
 	load_i18n();
 
 	$('#titlebox').hover(
@@ -76,8 +75,14 @@ if (window.sidebar) {
 
 function window_resize() {
 	resize_overlay();
-	if ($(window).width() < 960 || $(window).height() < 720) { overlay(i18n.viewport_too_small); }
-	else if (activeOverlayMessage == i18n.viewport_too_small) overlay_disable();
+	if ($(window).width() < 960 || $(window).height() < 720) {
+		overlay(i18n.viewport_too_small);
+		$('#container').addClass('highlighted');
+	}
+	else if (activeOverlayMessage == i18n.viewport_too_small) {
+		overlay_disable();
+		$('#container').removeClass('highlighted');
+	}
 }
 function resize_overlay() {
 	$('#overlay').width($(window).width()).height($(window).height());
@@ -116,8 +121,10 @@ function arrays_equal(a,b) {
 }
 
 function load_i18n() {
-	overlay(i18n.loading_i18n);
+	overlay(i18n_loading);
 	$.getJSON('json/i18n/en-us.json', function (data) {
-		alert('lol');
+		i18n = data;
+		overlay_disable();
+		initialize();
 	});
 }
