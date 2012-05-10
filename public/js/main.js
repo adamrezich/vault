@@ -79,12 +79,10 @@ function window_resize() {
 	if (browserSucks) return;
 	if ($(window).width() < 960 || $(window).height() < 720) {
 		overlay(i18n.viewport_too_small);
-		//$('#container').addClass('highlighted');
 		$('#container-outline').fadeIn();
 	}
 	else if (activeOverlayMessage == i18n.viewport_too_small) {
 		overlay_disable();
-		//$('#container').removeClass('highlighted');
 		$('#container-outline').fadeOut();
 	}
 }
