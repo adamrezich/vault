@@ -3,6 +3,7 @@ i18n_loaded = false;
 i18n = {};
 
 activeOverlayMessage = null;
+browserSucks = false;
 
 $(document).ready(function () {
 	resize_overlay();
@@ -50,7 +51,7 @@ $(document).ready(function () {
 });
 
 function initialize() {
-	check_for_browser_suckage();
+	browserSucks = check_for_browser_suckage();
 	window_resize();
 	$(window).resize(function () {
 		window_resize();
@@ -75,26 +76,39 @@ if (window.sidebar) {
 
 function window_resize() {
 	resize_overlay();
+	if (browserSucks) return;
 	if ($(window).width() < 960 || $(window).height() < 720) {
 		overlay(i18n.viewport_too_small);
-		$('#container').addClass('highlighted');
+		//$('#container').addClass('highlighted');
+		$('#container-outline').fadeIn();
 	}
 	else if (activeOverlayMessage == i18n.viewport_too_small) {
 		overlay_disable();
-		$('#container').removeClass('highlighted');
+		//$('#container').removeClass('highlighted');
+		$('#container-outline').fadeOut();
 	}
 }
+
 function resize_overlay() {
 	$('#overlay').width($(window).width()).height($(window).height());
 	$('#overlay-message').width($(window).width()).height($(window).height());
 }
 
 function check_for_browser_suckage() {
-	if ($.browser.msie) overlay(i18n.using_IE, true);
+	if ($.browser.msie) {
+		overlay(i18n.using_IE, true);
+		return true;
+	}
+	return false;
 }
 
 function overlay(message, override) {
-	if (activeOverlayMessage && !override) return;
+	if (override && $('#overlay').css('display') == 'block') {
+		overlay_disable();
+		setTimeout(function () { overlay(message); }, 1000);
+		return;
+	}
+	if (activeOverlayMessage) return;
 	activeOverlayMessage = message;
 	if ($.isArray(message)) {
 		var newMessage = '';
