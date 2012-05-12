@@ -4,10 +4,104 @@ i18n = {};
 
 activeOverlayMessage = null;
 browserSucks = false;
+enforceViewportSize = false;
+
+key = {
+	_pressed: [],
+	isDown: function (keyCode) {
+		return ($.inArray(keyCode, this._pressed) != -1);
+		/*for (var key in this._pressed) {
+			if (key == keyCode) return this._pressed[keyCode];
+		}
+		return false;*/
+	},
+	_down: function (event) {
+		//this._pressed[event.keyCode] = true;
+		for (var key in this._pressed) {
+			if (this._pressed[key] == event.keyCode) return false;
+		}
+		this._pressed.push(event.keyCode);
+	},
+	_up: function (event) {
+		var pos = $.inArray(event.keyCode, this._pressed);
+		if (pos != -1) this._pressed.splice(pos, 1);
+		//delete this._pressed[event.keyCode];
+	},
+	_clear: function () {
+		this._pressed.length = 0;
+	},
+	_shift: function () {
+		return this.isDown(this.shift);
+	},
+	0: 48,
+	1: 49,
+	2: 50,
+	3: 51,
+	4: 52,
+	5: 53,
+	6: 54,
+	7: 55,
+	8: 56,
+	9: 57,
+	a: 65,
+	b: 66,
+	c: 67,
+	d: 68,
+	e: 69,
+	f: 70,
+	g: 71,
+	h: 72,
+	i: 73,
+	j: 74,
+	k: 75,
+	l: 76,
+	m: 77,
+	n: 78,
+	o: 79,
+	p: 80,
+	q: 81,
+	r: 82,
+	s: 83,
+	t: 84,
+	u: 85,
+	v: 86,
+	w: 87,
+	x: 88,
+	y: 89,
+	z: 90,
+	arrow_e: [39, 76, 102],
+	arrow_ne: [85, 105],
+	arrow_n: [38, 75, 104],
+	arrow_nw: [89, 103],
+	arrow_w: [37, 72, 100],
+	arrow_sw: [66, 97],
+	arrow_s: [40, 74, 98],
+	arrow_se: [78, 99],
+	escape: 27,
+	backspace: 8,
+	enter: 13,
+	space: 32,
+	page_up: 33,
+	page_down: 34,
+	shift: 16,
+	forward_slash: 191,
+	tab: 9
+}
+
+function game() {
+
+}
+
+game.handleInput = function (event) {
+
+}
 
 $(document).ready(function () {
 	resize_overlay();
 	load_i18n();
+
+	window.addEventListener('keyup', function(event) { key._up(event); console.log(key.isDown(key.space)); }, false);
+	window.addEventListener('keydown', function(event) { key._down(event); console.log(key.isDown(key.space)); }, false);
 
 	$('#titlebox').hover(
 		function () {
@@ -23,17 +117,20 @@ $(document).ready(function () {
 			}
 		}
 	);
-	$('#titlebox.clickable').click(
-		function () {
-			$(this).removeClass('clickable');
-			$('#title').removeClass('hover');
-			$('#author').removeClass('hover');
-			$(this).css({ top: '250px', height: '220px' });
+	$('body').on('click', '#titlebox', login_click);
+	function login_click() {
+		$(this).removeClass('clickable');
+		$('body').off('click', '#titlebox', login_click);
+		$('#title').removeClass('hover');
+		$('#author').removeClass('hover');
+		$(this).css({ top: '250px', height: '220px' });
+		setTimeout(function () {
+			$('#loginbox').fadeIn(500);
 			setTimeout(function () {
-				$('#loginbox').fadeIn(500);
-			}, 50);
-		}
-	);
+				$('#login_username').focus();
+			}, 500);
+		}, 50);
+	}
 	$('#login_signin').click(
 		function () {
 			$('#titlebox').css('opacity', 0);
@@ -53,6 +150,8 @@ $(document).ready(function () {
 function initialize() {
 	browserSucks = check_for_browser_suckage();
 	window_resize();
+	state.reset();
+	state.add(new state_main());
 	$(window).resize(function () {
 		window_resize();
 	});
@@ -68,15 +167,16 @@ function layout(mode) {
 	$('#container').addClass(mode);
 }
 
-document.onselectstart = function() { return false; };
+document.onselectstart = function () { return false; };
 if (window.sidebar) {
-	document.onmousedown = function() { return false; };
-	document.onclick = function() { return true; };
+	document.onmousedown = function () { return false; };
+	document.onclick = function () { return true; };
 }
 
 function window_resize() {
 	resize_overlay();
 	if (browserSucks) return;
+	if (!enforceViewportSize) return;
 	if ($(window).width() < 960 || $(window).height() < 720) {
 		overlay(i18n.viewport_too_small);
 		$('#container-outline').fadeIn();

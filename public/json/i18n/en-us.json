@@ -6,6 +6,8 @@
 	],
 	"viewport_too_small": [
 		"VAULT requires the displayable region of your browser window to be at least 960x720 pixels.",
-		"Please resize your window so that the red box is fully visible in your browser window."
+		"Please resize your window so that the red box is fully visible in your browser window.",
+		"If your display is such that you cannot resize your browser to this size,",
+		"consider trying your browser's fullscreen mode (typically F11 on PCs, Cmd+Shift+F on Macs)."
 	]
 }
