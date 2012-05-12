@@ -10,22 +10,19 @@ key = {
 	_pressed: [],
 	isDown: function (keyCode) {
 		return ($.inArray(keyCode, this._pressed) != -1);
-		/*for (var key in this._pressed) {
-			if (key == keyCode) return this._pressed[keyCode];
-		}
-		return false;*/
 	},
 	_down: function (event) {
-		//this._pressed[event.keyCode] = true;
 		for (var key in this._pressed) {
 			if (this._pressed[key] == event.keyCode) return false;
 		}
 		this._pressed.push(event.keyCode);
+		for (var key in state.current().keys) {
+			if (this.isDown(state.current().keys[key].keys) && ((state.current().keys[key].shift && this.isDown(this.shift)) || (!state.current().keys[key].shift && !this.isDown(this.shift)) || state.current().keys[key].shift_optional)) state.current().keys[key].action();
+		}
 	},
 	_up: function (event) {
 		var pos = $.inArray(event.keyCode, this._pressed);
 		if (pos != -1) this._pressed.splice(pos, 1);
-		//delete this._pressed[event.keyCode];
 	},
 	_clear: function () {
 		this._pressed.length = 0;
@@ -33,16 +30,16 @@ key = {
 	_shift: function () {
 		return this.isDown(this.shift);
 	},
-	0: 48,
-	1: 49,
-	2: 50,
-	3: 51,
-	4: 52,
-	5: 53,
-	6: 54,
-	7: 55,
-	8: 56,
-	9: 57,
+	_0: 48,
+	_1: 49,
+	_2: 50,
+	_3: 51,
+	_4: 52,
+	_5: 53,
+	_6: 54,
+	_7: 55,
+	_8: 56,
+	_9: 57,
 	a: 65,
 	b: 66,
 	c: 67,
@@ -100,8 +97,8 @@ $(document).ready(function () {
 	resize_overlay();
 	load_i18n();
 
-	window.addEventListener('keyup', function(event) { key._up(event); console.log(key.isDown(key.space)); }, false);
-	window.addEventListener('keydown', function(event) { key._down(event); console.log(key.isDown(key.space)); }, false);
+	window.addEventListener('keyup', function(event) { key._up(event); }, false);
+	window.addEventListener('keydown', function(event) { key._down(event); }, false);
 
 	$('#titlebox').hover(
 		function () {

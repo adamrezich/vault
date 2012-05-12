@@ -57,7 +57,6 @@ state_main.prototype = new state();
 state_main.prototype.keys = {
 	input: {
 		keys: key.enter,
-		shift: false,
 		action: function () { console.log('input mode engaged!'); }
 	},
 	input_lock: {
