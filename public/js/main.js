@@ -16,19 +16,49 @@ key = {
 			if (this._pressed[key] == event.keyCode) return false;
 		}
 		this._pressed.push(event.keyCode);
+		if (!state.current()) return;
 		for (var key in state.current().keys) {
-			if (this.isDown(state.current().keys[key].keys) && ((state.current().keys[key].shift && this.isDown(this.shift)) || (!state.current().keys[key].shift && !this.isDown(this.shift)) || state.current().keys[key].shift_optional)) state.current().keys[key].action();
+			if (this.isDown(state.current().keys[key].keys) && ((state.current().keys[key].shift && this.isDown(this.shift)) || (!state.current().keys[key].shift && !this.isDown(this.shift)) || state.current().keys[key].shift_optional)) {
+				state.current().keys[key].action();
+				break;
+			}
 		}
+		//return this._disabled(event.keyCode);
 	},
 	_up: function (event) {
 		var pos = $.inArray(event.keyCode, this._pressed);
 		if (pos != -1) this._pressed.splice(pos, 1);
+		return this._disabled(event.keyCode);
 	},
 	_clear: function () {
 		this._pressed.length = 0;
 	},
 	_shift: function () {
 		return this.isDown(this.shift);
+	},
+	_disabled: function (keyCode) {
+		switch (keyCode) {
+			case key.backspace:
+				if (state.current().backspace_enabled) return true;
+				event.preventDefault();
+				return false;
+			case key.arrow_e[0]:
+			case key.arrow_n[0]:
+			case key.arrow_w[0]:
+			case key.arrow_s[0]:
+				if (state.current().arrows_enabled) return true;
+				event.preventDefault();
+				return false;
+			case key.space:
+				if (state.current().space_enabled) return true;
+				event.preventDefault();
+				return false;
+			case key.tab:
+				if (state.current().tab_enabled) return true;
+				event.preventDefault();
+				return false;
+		}
+		return true;
 	},
 	_0: 48,
 	_1: 49,
@@ -86,11 +116,12 @@ key = {
 }
 
 function game() {
-
 }
 
-game.handleInput = function (event) {
-
+game.start = function () {
+	state.replace(new state_main());
+	$('#titlebox').remove();
+	layout_1col();
 }
 
 $(document).ready(function () {
@@ -99,6 +130,10 @@ $(document).ready(function () {
 
 	window.addEventListener('keyup', function(event) { key._up(event); }, false);
 	window.addEventListener('keydown', function(event) { key._down(event); }, false);
+
+	$(document).keydown(function (event) { return key._disabled(event.keyCode); })
+
+	//game.start();
 
 	$('#titlebox').hover(
 		function () {
@@ -132,8 +167,7 @@ $(document).ready(function () {
 		function () {
 			$('#titlebox').css('opacity', 0);
 			setTimeout(function () {
-				$('#titlebox').remove();
-				layout_1col();
+				game.start();
 			}, 500);
 		}
 	);
@@ -148,7 +182,7 @@ function initialize() {
 	browserSucks = check_for_browser_suckage();
 	window_resize();
 	state.reset();
-	state.add(new state_main());
+	state.add(new state_signIn());
 	$(window).resize(function () {
 		window_resize();
 	});
@@ -225,8 +259,8 @@ function overlay_disable() {
 	$('#overlay').fadeOut();
 }
 
-function arrays_equal(a,b) {
-	return !!a && !!b && !(a<b || b<a);
+function arrays_equal(a, b) {
+	return !!a && !!b && !(a < b || b < a);
 }
 
 function load_i18n() {

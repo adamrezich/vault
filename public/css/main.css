@@ -51,7 +51,7 @@ body {
 }
 
 #container {
-	background: rgba(34, 34, 34, 1); /*#222 url('../images/960x720.png');*/
+	background: rgba(34, 34, 34, 1) url('../images/960x720.png');
 	margin-left: auto;
 	margin-right: auto;
 	width: 960px;
@@ -230,7 +230,46 @@ body {
  * INPUT
  */
 
+#input {
+	position: absolute;
+	top: 5px;
+	left: 25px;
+	right: 5px;
+	padding: 2px 5px;
+	font-size: 24px;
+	background: rgba(85, 85, 85, 0.5);
+	height: 1.25em;
+}
+
+#prompt {
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	padding: 2px 5px;
+	font-size: 24px;
+	-webkit-transform: rotate(-90deg);
+	-moz-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	-ms-transform: rotate(-90deg);
+
+	-webkit-transition: -webkit-transform 0.35s ease-in-out, opacity 0.35s ease-in-out;
+	-moz-transition: -moz-transform 0.35s ease-in-out, opacity 0.35s ease-in-out;
+	-o-transition: -o-transform 0.35s ease-in-out, opacity 0.35s ease-in-out;
+	-ms-transition: -ms-transition 0.35s ease-in-out, opacity 0.35s ease-in-out;
+	transition: -webkit-transform 0.35s ease-in-out, opacity 0.35s ease-in-out;
+	opacity: 0;
+}
+
+#prompt.active {
+	-webkit-transform: rotate(0deg);
+	-moz-transform: rotate(0deg);
+	-o-transform: rotate(0deg);
+	-ms-transform: rotate(0deg);
+	opacity: 1;
+}
+
 #inputcontainer {
+	position: relative;
 	background: rgba(60, 60, 60, 1);
 }
 
