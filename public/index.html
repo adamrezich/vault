@@ -1,58 +1,138 @@
-<!DOCTYPE HTML>
-<html lang="en-US">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Vault</title>
-	<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700,700italic,400italic' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=EB+Garamond' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="css/reset.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script type="text/javascript" src="js/main.js"></script>
-	<script type="text/javascript" src="js/states.js"></script>
+<title>vault engine test</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script src="/nowjs/now.js"></script>
+<link rel="stylesheet" type="text/css" href="css/test.css">
+
+<script>
+
+var signed_in = false;
+
+function handle_errors(result) {
+	if (Object.prototype.toString.call(result.error) === '[object Array]') {
+		for (var e in result.error) flash(result.error[e]);
+	}
+	else if (result.error) flash(result.error);
+	
+	if (Object.prototype.toString.call(result.notice) === '[object Array]') {
+		for (var n in result.notice) flash(result.notice[n]);
+	}
+	else if (result.notice) flash(result.notice);
+}
+
+function clear_flashes() {
+	$('#flashes>.flash').remove();
+}
+
+function flash(message) {
+	var close = $('<span>').addClass('close-button').html('X');
+	close.click(function(e) {
+		$(e.currentTarget).parent().hide().remove();
+	});
+	var f = $('<div>').addClass('flash').html(message);
+	close.appendTo(f);
+	f.appendTo('#flashes');
+}
+
+$(document).ready(function() {
+
+	now.receiveFeedback = function(feedback) {
+		if (feedback.messages) {
+			$('#messages>div').addClass('read');
+			for (var m in feedback.messages) {
+				$("#messages").append('<div>' + feedback.messages[m] + '</div>');
+			}
+		}
+	}
+	
+	now.debug = function(message) {
+		flash(message);
+	}
+
+	$("#send-button").click(function() {
+		now.sendCommand($("#text-input").val());
+		$("#text-input").val("");
+	});
+
+	$("#signin-button").click(function() {
+		clear_flashes();
+		now.signIn($('#username').val(), $('#password').val(), function(result) {
+			handle_errors(result);
+			if (result.success) {
+				$('#user-area').html('signed in as ' + result.data.name);
+				$('#signin-button').hide();
+				$('#signup-button').hide();
+				$('#signout-button').show();
+				$('#username').hide();
+				$('#password').hide();
+			}
+		});
+	});
+	
+	$('#signout-button').click(function() {
+		clear_flashes();
+		flash('Signed out!');
+		now.signOut(function(result) {
+			handle_errors(result);
+			if (result.success) {
+				$('#user-area').html('not signed in');
+				$('#signin-button').hide();
+				$('#signup-button').hide();
+				$('#signout-button').hide();
+				$('#username').show();
+				$('#password').show();
+				$('#username').val('');
+				$('#password').val('');
+			}
+		});
+	});
+	
+	$("#signup-button").click(function() {
+		clear_flashes();
+		now.signUp($('#username').val(), $('#password').val(), $('#confirm-password').val(), function(result) {
+			handle_errors(result);
+			if (result.success) {
+				$('#signup-button').hide();
+				$('#confirm-password').hide();
+				$('#confirm-password').val('');
+				$('#signin-button').show();
+			}
+		});
+	});
+	
+	$('#username').blur(function() {
+		now.playerExists($('#username').val(), function(exists) {
+			if (exists) {
+				$('#confirm-password').hide();
+				$('#signup-button').hide();
+				$('#signin-button').show();
+			}
+			else {
+				$('#confirm-password').show();
+				$('#signup-button').show();
+				$('#signin-button').hide();
+			}
+		});
+	});
+});
+</script>
 </head>
+
 <body>
-	<div id="container">
-		<div id="titlebox" class="clickable" style="opacity: 1">
-			<div id="title">Vault</div>
-			<div id="author">by Adam Rezich</div>
-			<div id="loginbox" style="display: none">
-				<input type="text" placeholder="username" id="login_username" />
-				<input type="password" placeholder="password" id="login_password" />
-				<input type="button" value="sign in" id="login_signin" />
-				<input type="button" value="register" id="login_register" />
-			</div>
-		</div>
-		<div id="logcontainer">
-			<div id="log">this is the interactive fiction-style log area thing where the messages and stuff come up. VAULT is all about the UI changing to match the current situation; click the links at the top to simulate the different UI modes.</div>
-		</div>
-		<div id="inputcontainer">
-			<div id="prompt">&gt;</div>
-			<div id="input"></div>
-		</div>
-		<div id="gridcontainer" style="">
-			<div id="grid"></div>
-		</div>
-		<div id="placecontainer" style="">
-			<div id="place">
-				<div id="smallplace">Navidson Hall</div>
-				<div id="bigplace">Room 108</div>
-			</div>
-		</div>
-		<div id="timecontainer" style="">
-			<div id="date">
-				<div id="month">May</div>
-				<div id="day">24</div>
-			</div>
-			<div id="time">01:08</div>
-		</div>
-		<div id="debug"><a href="javascript:layout('onecolumnbasic')">one column basic</a> | <a href="javascript:layout('onecolumn')">one column</a> | <a href="javascript:layout('roguelike')">roguelike</a></div>
-		<div id="container-outline"></div>
+	<div id="flashes"></div>
+	<div>
+		<span id="user-area">not signed in</span>
+		<input type="button" value="Sign Out" id="signout-button" style="display: none;">
 	</div>
-	<div id="overlay">
-		<div id="overlay-message"></div>
-	</div>
+	<input type="text" id="username" placeholder="username">
+	<input type="password" id="password" placeholder="password">
+	<input type="password" id="confirm-password" placeholder="confirm password" style="display: none;">
+	<input type="button" value="Sign In" id="signin-button" style="display: none;">
+	<input type="button" value="Sign Up" id="signup-button" style="display: none;">
+	<div id="messages"></div>
+	<input type="text" id="text-input">
+	<input type="button" value="Send" id="send-button">
 </body>
 </html>

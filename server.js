@@ -1,5 +1,6 @@
 var crypto = require('crypto');
 var fs = require('fs');
+var path = require('path');
 var util = require('util');
 var shasum = crypto.createHash('sha1');
 var check = require('validator').check;
@@ -25,10 +26,39 @@ fs.exists(__dirname + '/data', function(exists) {
 
 var activePlayers = [];
 
-var server = require('http').createServer(function(req, res) {
-	res.end(fs.readFileSync(__dirname + '/public/test_client.html'));
-});
-server.listen(8080);
+var server = require('http').createServer(function(request, response) {
+	var pathRoot = './public';
+	var filePath = pathRoot + request.url;
+	if (request.url == '/') filePath = pathRoot + '/index.html';
+	var contentType = 'text/html';
+	switch (path.extname(filePath)) {
+		case '.js':
+			contentType = 'text/javascript';
+			break;
+		case '.css':
+			contentType = 'text/css';
+			break;
+	}
+	fs.exists(filePath, function(exists) {
+		if (exists) {
+			fs.readFile(filePath, function(error, content) {
+				if (error) {
+					response.writeHead(500);
+					response.end();
+				}
+				else {
+					response.writeHead(200, { 'Content-Type': contentType });
+					response.end(content, 'utf-8');
+				}
+			});
+		}
+		else {
+			response.writeHead(404);
+			response.end();
+		}
+	});
+	//res.end(fs.readFileSync(__dirname + '/public/test_client.html'));
+}).listen(8080);
 
 var nowjs = require("now");
 var everyone = nowjs.initialize(server);
@@ -46,9 +76,11 @@ nowjs.on('disconnect', function() {
 	}
 });
 
-everyone.now.distributeMessage = function(message) {
-	if (activePlayers[this.user.clientId].signed_in) everyone.now.receiveMessage(activePlayers[this.user.clientId].player.name, message);
-	else everyone.now.receiveMessage(activePlayers[this.user.clientId].player.name + "*", message);
+everyone.now.sendCommand = function(command) {
+	/*if (activePlayers[this.user.clientId].signed_in) everyone.now.receiveMessage(activePlayers[this.user.clientId].player.name, message);
+	else everyone.now.receiveMessage(activePlayers[this.user.clientId].player.name + "*", message);*/
+	var feedback = parse_command(activePlayers[this.user.clientId].player, command);
+	this.now.receiveFeedback(feedback);
 };
 
 everyone.now.signIn = function(username, password, callback) {
@@ -153,6 +185,15 @@ everyone.now.playerExists = function(username, callback) {
 	});
 }
 
-function Player (name) {
+function Player(name) {
 	this.name = name;
+}
+
+function parse_command(player, command) {
+	var feedback = {};
+	feedback.messages = [];
+	feedback.messages.push("Ahoy, " + player.name + "!");
+	feedback.messages.push("We're testing multiple messages!");
+	if (feedback.messages.length == 0) delete feedback.messages;
+	return feedback;
 }

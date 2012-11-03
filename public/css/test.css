@@ -1,0 +1,16 @@
+.flash {
+	background: yellow;
+}
+.flash > .close-button {
+	float: right;
+	cursor: pointer;
+}
+#messages > div {
+	border: 1px dashed #999;
+	margin-bottom: 4px;
+}
+#messages > .read {
+	background: #ccc;
+	border-color: #666;
+	color: #333;
+}

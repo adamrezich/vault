@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Vault</title>
+	<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700,700italic,400italic' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=EB+Garamond' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="css/reset.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+	<script type="text/javascript" src="js/states.js"></script>
+</head>
+<body>
+	<div id="container">
+		<div id="titlebox" class="clickable" style="opacity: 1">
+			<div id="title">Vault</div>
+			<div id="author">by Adam Rezich</div>
+			<div id="loginbox" style="display: none">
+				<input type="text" placeholder="username" id="login_username" />
+				<input type="password" placeholder="password" id="login_password" />
+				<input type="button" value="sign in" id="login_signin" />
+				<input type="button" value="register" id="login_register" />
+			</div>
+		</div>
+		<div id="logcontainer">
+			<div id="log">this is the interactive fiction-style log area thing where the messages and stuff come up. VAULT is all about the UI changing to match the current situation; click the links at the top to simulate the different UI modes.</div>
+		</div>
+		<div id="inputcontainer">
+			<div id="prompt">&gt;</div>
+			<div id="input"></div>
+		</div>
+		<div id="gridcontainer" style="">
+			<div id="grid"></div>
+		</div>
+		<div id="placecontainer" style="">
+			<div id="place">
+				<div id="smallplace">Navidson Hall</div>
+				<div id="bigplace">Room 108</div>
+			</div>
+		</div>
+		<div id="timecontainer" style="">
+			<div id="date">
+				<div id="month">May</div>
+				<div id="day">24</div>
+			</div>
+			<div id="time">01:08</div>
+		</div>
+		<div id="debug"><a href="javascript:layout('onecolumnbasic')">one column basic</a> | <a href="javascript:layout('onecolumn')">one column</a> | <a href="javascript:layout('roguelike')">roguelike</a></div>
+		<div id="container-outline"></div>
+	</div>
+	<div id="overlay">
+		<div id="overlay-message"></div>
+	</div>
+</body>
+</html>
