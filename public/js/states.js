@@ -1,12 +1,12 @@
 ////
-// state - game state machine
+// State - game State machine
 ////
 
-function state() { }
+function State() { }
 
-state.list = [];
+State.list = [];
 
-state.current = function () {
+State.current = function() {
 	if (this.list.length > 0) {
 		return this.list[this.list.length - 1];
 	}
@@ -15,235 +15,109 @@ state.current = function () {
 	}
 }
 
-state.add = function (s, options) {
-	state.list.push(s);
-	state.current().draw();
+State.add = function(s, options) {
+	Key.clear();
+	State.list.push(s);
+	State.current().draw();
 }
 
-state.replace = function(s, options) {
-	state.list.pop();
-	state.add(s, options);
+State.replace = function(s, options) {
+	State.list.pop();
+	State.add(s, options);
 }
 
-state.reset = function () {
-	state.list = [];
+State.reset = function() {
+	State.list = [];
 }
 
-state.pop = function (options) {
-	state.list.pop();
-	clear();
+State.pop = function(options) {
+	Key.clear();
+	State.list.pop();
 	if (options) {
 		if (options.noredraw) return;
 	}
-	state.current().draw();
+	State.current().draw();
 }
 
-state.prototype.keys = { }
+State.prototype.keys = { }
 
-state.prototype.draw = function () { }
+State.prototype.draw = function() { }
 
-state.prototype.update = function () { }
+State.prototype.update = function() { }
 
-state.prototype.first_draw = function () { }
+State.prototype.first_draw = function() { }
+
+State.prototype.handle_input = function() {
+	for (var k in this.keys) {
+		console.log(this.keys[k]);
+	}
+}
 
 
 
-function state_signIn() {
+function State_signIn() {
 	this.backspace_enabled = true;
 	this.arrows_enabled = true;
 	this.space_enabled = true;
 	this.tab_enabled = true;
 }
 
-state_signIn.prototype = new state();
+State_signIn.prototype = new State();
 
 
 
-function state_main() {
+function State_main() {
 }
 
-state_main.prototype = new state();
+State_main.prototype = new State();
 
-state_main.prototype.keys = {
-	input: {
-		keys: key.enter,
-		action: function () { state.add(new state_input()); }
-	},
-	input_lock: {
-		keys: key.enter,
-		shift: true,
-		action: function () { state.add(new state_input(true)); }
-	}
+State_main.prototype.update = function() {
+	if (Key.isPressed(Key.code.enter) && Game.inputReady) State.add(new State_input(Key.isDown(Key.code.shift)));
 }
 
 
-
-function state_input(locked) {
+function State_input(locked) {
 	this.locked = locked;
 	this.buffer = "";
-	$('#prompt').addClass('active');
+	$('#inputcontainer').addClass('active');
 }
 
-state_input.prototype = new state();
+State_input.prototype = new State();
 
-state_input.prototype.keys = {
-	a: {
-		keys: key.a,
-		shift_optional: true,
-		action: function () { state.current().type_char('a'); }
-	},
-	b: {
-		keys: key.b,
-		shift_optional: true,
-		action: function () { state.current().type_char('b'); }
-	},
-	c: {
-		keys: key.c,
-		shift_optional: true,
-		action: function () { state.current().type_char('c'); }
-	},
-	d: {
-		keys: key.d,
-		shift_optional: true,
-		action: function () { state.current().type_char('d'); }
-	},
-	e: {
-		keys: key.e,
-		shift_optional: true,
-		action: function () { state.current().type_char('e'); }
-	},
-	f: {
-		keys: key.f,
-		shift_optional: true,
-		action: function () { state.current().type_char('f'); }
-	},
-	g: {
-		keys: key.g,
-		shift_optional: true,
-		action: function () { state.current().type_char('g'); }
-	},
-	h: {
-		keys: key.h,
-		shift_optional: true,
-		action: function () { state.current().type_char('h'); }
-	},
-	i: {
-		keys: key.i,
-		shift_optional: true,
-		action: function () { state.current().type_char('i'); }
-	},
-	j: {
-		keys: key.j,
-		shift_optional: true,
-		action: function () { state.current().type_char('j'); }
-	},
-	k: {
-		keys: key.k,
-		shift_optional: true,
-		action: function () { state.current().type_char('k'); }
-	},
-	l: {
-		keys: key.l,
-		shift_optional: true,
-		action: function () { state.current().type_char('l'); }
-	},
-	m: {
-		keys: key.m,
-		shift_optional: true,
-		action: function () { state.current().type_char('m'); }
-	},
-	n: {
-		keys: key.n,
-		shift_optional: true,
-		action: function () { state.current().type_char('n'); }
-	},
-	o: {
-		keys: key.o,
-		shift_optional: true,
-		action: function () { state.current().type_char('o'); }
-	},
-	p: {
-		keys: key.p,
-		shift_optional: true,
-		action: function () { state.current().type_char('p'); }
-	},
-	q: {
-		keys: key.q,
-		shift_optional: true,
-		action: function () { state.current().type_char('q'); }
-	},
-	r: {
-		keys: key.r,
-		shift_optional: true,
-		action: function () { state.current().type_char('r'); }
-	},
-	s: {
-		keys: key.s,
-		shift_optional: true,
-		action: function () { state.current().type_char('s'); }
-	},
-	t: {
-		keys: key.t,
-		shift_optional: true,
-		action: function () { state.current().type_char('t'); }
-	},
-	u: {
-		keys: key.u,
-		shift_optional: true,
-		action: function () { state.current().type_char('u'); }
-	},
-	v: {
-		keys: key.v,
-		shift_optional: true,
-		action: function () { state.current().type_char('v'); }
-	},
-	w: {
-		keys: key.w,
-		shift_optional: true,
-		action: function () { state.current().type_char('w'); }
-	},
-	x: {
-		keys: key.x,
-		shift_optional: true,
-		action: function () { state.current().type_char('x'); }
-	},
-	y: {
-		keys: key.y,
-		shift_optional: true,
-		action: function () { state.current().type_char('y'); }
-	},
-	z: {
-		keys: key.z,
-		shift_optional: true,
-		action: function () { state.current().type_char('z'); }
-	},
-	space: {
-		keys: key.space,
-		shift_optional: true,
-		action: function () { state.current().type_char(' '); }
-	},
-	confirm: {
-		keys: key.enter,
-		action: function () { state.current().confirm(); }
-	},
-	backspace: {
-		keys: key.backspace,
-		action: function () { state.current().delete_char(); }
-	},
+State_input.prototype.update = function() {
+	for (var i = 0; i < Key.typables.length; i++) {
+		var str = String.fromCharCode(Key.typables[i]).toLowerCase();
+		if (Key.isDown(Key.code.shift)) str = str.toUpperCase();
+		if (Key.isPressed(Key.typables[i])) {
+			this.type_char(str);
+		}
+	}
+	if (Key.isPressed(Key.code.backspace)) this.delete_char();
+	if (Key.isPressed(Key.code.enter)) this.confirm();
 }
 
-state_input.prototype.type_char = function (chr) {
+State_input.prototype.type_char = function(chr) {
 	this.buffer += chr;
-	$('#input').html(this.buffer);
+	$('#input-text').html(this.buffer);
 }
 
-state_input.prototype.confirm = function () {
-	$('#prompt').removeClass();
-	state.pop();
+State_input.prototype.confirm = function() {
+	$('#inputcontainer').removeClass();
+	if (this.buffer != "") {
+		now.sendCommand(this.buffer);
+		var cmd= $('<div>').addClass('command').html('> ' + this.buffer);
+		cmd.appendTo('#log');
+	}
+	Game.inputReady = false;
+	setTimeout(function() {
+		$('#input-text').html('');
+		Game.inputReady = true;
+	}, 200);
+	State.pop();
 }
 
-state_input.prototype.delete_char = function () {
+State_input.prototype.delete_char = function() {
 	if (this.buffer == '') return;
 	this.buffer = this.buffer.substring(0, this.buffer.length - 1);
-	$('#input').html(this.buffer);
+	$('#input-text').html(this.buffer);
 }

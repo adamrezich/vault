@@ -38,6 +38,9 @@ var server = require('http').createServer(function(request, response) {
 		case '.css':
 			contentType = 'text/css';
 			break;
+		case '.png':
+			contentType = 'image/png';
+			break;
 	}
 	fs.exists(filePath, function(exists) {
 		if (exists) {
@@ -65,9 +68,11 @@ var everyone = nowjs.initialize(server);
 
 nowjs.on('connect', function() {
 	activePlayers[this.user.clientId] = {player: new Player('_unnamed_' + crypto.createHash('sha1').update((new Date()).getTime().toString()).digest('hex')), signed_in: false};
+	//everyone.now.distributeMessage(activePlayers[this.user.clientId], 'You feel as though someone else has appeared near you, but you can\'t see them, or anything for that matter.');
 });
 
 nowjs.on('disconnect', function() {
+	//everyone.now.distributeMessage(activePlayers[this.user.clientId], 'You feel a sense of loss, as though someone nearby has left you.');
 	for (var i in activePlayers) {
 		if (i == this.user.clientId) {
 			delete activePlayers[i];
@@ -75,6 +80,11 @@ nowjs.on('disconnect', function() {
 		}
 	}
 });
+
+everyone.now.distributeMessage = function(sender, message) {
+	var feedback = { messages: [ message ] };
+	if (activePlayers[this.user.clientId].player != sender) this.now.receiveFeedback(feedback);
+};
 
 everyone.now.sendCommand = function(command) {
 	/*if (activePlayers[this.user.clientId].signed_in) everyone.now.receiveMessage(activePlayers[this.user.clientId].player.name, message);
@@ -88,6 +98,14 @@ everyone.now.signIn = function(username, password, callback) {
 	var thisuser = this.user;
 	username = sanitize(username).xss();
 	password = sanitize(password).xss();
+	if (username == '') {
+		callback({ error: 'You didn\'t even enter a username.' });
+		return;
+	}
+	if (password == '') {
+		callback({ error: 'You didn\'t even enter a password.' });
+		return;
+	}
 	fs.exists(__dirname + '/data/players/' + username, function(exists) {
 		if (exists) {
 			fs.readFile(__dirname + '/data/players/' + username, function(err, data) {
@@ -143,10 +161,19 @@ everyone.now.signUp = function(username, password, confirm_password, callback) {
 	password = sanitize(password).xss();
 	confirm_password = sanitize(confirm_password).xss();
 	
+	if (username == '') {
+		callback({ error: 'You didn\'t even enter a username.' });
+		return;
+	}
+	if (password == '') {
+		callback({ error: 'You didn\'t even enter a password.' });
+		return;
+	}
+	
 	var thisnow = this.now;
 	var v = new Validator();
 	v.check(username, "Username must be between 3 and 15 characters.").len(3, 15);
-	v.check(username, "Username must only contain letters, numbers, hyphens, and underscores.").is(/^[a-z0-9_-]+$/);
+	v.check(username, "Username must only contain letters, numbers, hyphens, and underscores.").is(/^[A-Za-z0-9_-]+$/);
 	v.check(password, "Password must be between 6 and 32 characters.").len(6, 32);
 	v.check(password, "Passwords do not match.").equals(confirm_password);
 	
@@ -192,8 +219,12 @@ function Player(name) {
 function parse_command(player, command) {
 	var feedback = {};
 	feedback.messages = [];
-	feedback.messages.push("Ahoy, " + player.name + "!");
-	feedback.messages.push("We're testing multiple messages!");
+	if (command.substring(0, 4) == "say ") {
+		feedback.messages.push("You shout into the empty void and hope that someone else somewhere can hear you.");
+		everyone.now.distributeMessage(player, 'A distant voice shouts: "' + command.substring(4) + '"');
+	}
+	else feedback.messages.push("Unknown command. Because, y'know, there aren't any actual commands yet.");
+	//feedback.messages.push("We're testing multiple messages!");
 	if (feedback.messages.length == 0) delete feedback.messages;
 	return feedback;
 }
