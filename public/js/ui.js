@@ -89,7 +89,7 @@ $(document).ready(function() {
 		$('#log>div').addClass('read');
 		if (feedback.messages) {
 			for (var m in feedback.messages) {
-				$("#log").append('<div>' + feedback.messages[m] + '</div>');
+				$("#log").append('<div' + (feedback.messages[m].charAt(0) == '_' ? ' class="room-name"' : '') + '>' + (feedback.messages[m].charAt(0) == '_' ? feedback.messages[m].substring(1) : feedback.messages[m]) + '</div>');
 				scroll_to_bottom_of_log();
 			}
 		}
@@ -118,10 +118,8 @@ $(document).ready(function() {
 					layout_1col();
 					setTimeout(function() {
 						$('#log').width($('#log').width() + $('#log').width() - document.getElementById("log").scrollWidth + 5);
+						now.sendCommand('look');
 					}, 1000);
-					$('#log').append('<div class="read">HINT: press Enter to open the prompt, type a command, and then press Enter again to send it.</div>');
-					$('#log').append('<div class="read">HINT: this is going to be an interactive fiction text adventure thing, but right now, for no good reason, the only command that does anything is "say."</div>');
-					$('#log').append('<div class="description">You stand in a dark, empty void, probably because isn\'t a world for this game to exist in yet. The obvious exits are... well, there aren\'t actually any obvious exits.</div>');
 				}, 500);
 				/*$('#user-area').html('signed in as ' + result.data.name);
 				$('#signin-button').hide();

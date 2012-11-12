@@ -247,6 +247,14 @@ body {
 	margin-left: 16px;
 }
 
+#log > div.room-name {
+	font-weight: bold;
+	border-bottom: 1px solid white;
+	color: white;
+	margin-right: 4px;
+	margin-bottom: 3px;
+}
+
 #logcontainer {
 	background: rgba(20, 20, 20, 1);
 }

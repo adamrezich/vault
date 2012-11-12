@@ -192,6 +192,7 @@ everyone.now.signUp = function(username, password, confirm_password, callback) {
 			var p = new Player();
 			p.name = username;
 			p.password = crypto.createHash('sha1').update(password).digest('hex');
+			p.room = 'start';
 			fs.writeFile(__dirname + '/data/players/' + username, JSON.stringify(p), function(err) {
 				if (err) {
 					callback({ error: 'Something went super wrong in the wrong-zone' });
@@ -214,19 +215,11 @@ everyone.now.playerExists = function(username, callback) {
 
 function Player(name) {
 	this.name = name;
+	this.room = 'test1';
 }
 
 function parse_command(player, command) {
 	var feedback = {};
-	
-	
-	var room = {};
-	room.items = [];
-	room.items.push({ name: 'flask' });
-	
-	
-	
-	
 	feedback.messages = [];
 	/*if (command.substring(0, 4) == "say ") {
 		feedback.messages.push("You shout into the empty void and hope that someone else somewhere can hear you.");
@@ -247,24 +240,68 @@ function parse_command(player, command) {
 	var params = '';
 	if (split.length > 0) params = split.join(' ');
 	
+	var found = false;
 	for (var i = 0; i < commands.length; i++) {
 		var cmds = [];
 		if (Array.isArray(commands[i].verb)) cmds = commands[i].verb;
 		else cmds.push(commands[i].verb);
 		for (var j = 0; j < cmds.length; j++) {
 			if (cmd == cmds[j]) {
-				var cmdfeedback = commands[i].callback(params, player, room);
+				found = true;
+				var cmdfeedback = commands[i].callback(params, player);
 				if (cmdfeedback.messages) feedback.messages = feedback.messages.concat(cmdfeedback.messages);
 				if (cmdfeedback.layout) feedback.layout = cmdfeedback.layout;
 				break;
 			}
 		}
 	}
+	if (!found) feedback.messages.push('Command not understood. Type HELP for a list of commands.');
 	
 	if (feedback.messages.length == 0) delete feedback.messages;
 	return feedback;
 }
 
+function Item(name) {
+	this.name = name;
+}
+
+function Room(name, description, nav, items) {
+	this.name = name;
+	this.description = description;
+	this.nav = nav;
+	this.items = items;
+}
+
+Room.prototype.describe = function(messages) {
+	messages.push('_' + this.name);
+	messages.push(this.description);
+	return messages;
+}
+
+var rooms = {};
+rooms['start'] = new Room(
+	'Test Room One',
+	'The room is oddly empty, almost as though it is a debug room created solely for the purpose of testing a game engine or something. There is a doorway to the north.',
+	{
+		n: 'test2'
+	}
+);
+rooms['test2'] = new Room(
+	'Test Room Two',
+	'Like the room to the south, this room is indescribably devoid of content. There is a doorway to the south.',
+	{
+		s: 'start'
+	}
+);
+
+function move(player, direction, feedback) {
+	if (rooms[player.room].nav[direction]) {
+		player.room = rooms[player.room].nav[direction];
+		feedback.messages = rooms[player.room].describe(feedback.messages)
+	}
+	else feedback.messages.push('That isn\'t a useful direction from here.');
+	return feedback;
+}
 
 function Command(verb, callback) {
 	this.verb = verb;
@@ -272,21 +309,93 @@ function Command(verb, callback) {
 }
 
 var commands = [];
-commands.push(new Command(['get', 'g', 'take', 'grab'], function(params, player, room) {
+commands.push(new Command(['get', 'g', 'take', 'grab'], function(params, player) {
 	var feedback = {};
 	feedback.messages = [];
 	
-	console.log(params);
+	if (!params || params == '') {
+		feedback.messages.push('What do you want to get?');
+		return feedback;
+	}
+	
+	if (!rooms[player.room].items) {
+		feedback.messages.push('You see no such object in the room.');
+		return feedback;
+	}
 	
 	var found = false;
-	for (var i = 0; i < room.items.length; i++) {
-		if (room.items[i].name == params) {
-			feedback.messages.push('You take the ' + room.items[i].name + '.');
+	for (var i = 0; i < rooms[player.room].items.length; i++) {
+		if (rooms[player.room].items[i].name == params) {
+			feedback.messages.push('You take the ' + rooms[player.room].items[i].name + '.');
 			found = true;
 			break;
 		}
 	}
 	if (!found) feedback.messages.push('You see no such object in the room.');
+	
+	return feedback;
+}));
+commands.push(new Command(['look', 'l'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	feedback.messages = rooms[player.room].describe(feedback.messages);
+	
+	return feedback;
+}));
+commands.push(new Command(['north', 'n'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	feedback = move(player, 'n', feedback);
+	
+	return feedback;
+}));
+commands.push(new Command(['south', 's'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	feedback = move(player, 's', feedback);
+	
+	return feedback;
+}));
+commands.push(new Command(['east', 'e'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	feedback = move(player, 'e', feedback);
+	
+	return feedback;
+}));
+commands.push(new Command(['west', 'w'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	feedback = move(player, 'w', feedback);
+	
+	return feedback;
+}));
+commands.push(new Command(['up', 'u'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	feedback = move(player, 'u', feedback);
+	
+	return feedback;
+}));
+commands.push(new Command(['down', 'd'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	feedback = move(player, 'd', feedback);
+	
+	return feedback;
+}));
+commands.push(new Command(['help', 'h'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	feedback.messages.push('Sorry, there isn\'t a HELP list yet.');
 	
 	return feedback;
 }));
