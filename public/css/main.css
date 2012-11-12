@@ -212,6 +212,10 @@ body {
  * LOG
  */
 
+#logwrapper {
+	overflow: hidden;
+}
+
 #log {
 	left: 5px;
 	right: 5px;
@@ -219,6 +223,8 @@ body {
 	bottom: 5px;
 	position: absolute;
 	color: #ccc;
+	overflow-x: hidden;
+	overflow-y: scroll;
 }
 
 #log > div {

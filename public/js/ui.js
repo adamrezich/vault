@@ -78,6 +78,11 @@ function flash(message) {
 	f.appendTo('#flashes');
 }
 
+function scroll_to_bottom_of_log() {
+	//$("#log").scrollTop($("#log")[0].scrollHeight);
+	$('#log').stop().animate({ scrollTop: $('#log')[0].scrollHeight }, 'slow');
+}
+
 $(document).ready(function() {
 
 	now.receiveFeedback = function(feedback) {
@@ -85,6 +90,7 @@ $(document).ready(function() {
 			$('#log>div').addClass('read');
 			for (var m in feedback.messages) {
 				$("#log").append('<div>' + feedback.messages[m] + '</div>');
+				scroll_to_bottom_of_log();
 			}
 		}
 	}
@@ -101,6 +107,10 @@ $(document).ready(function() {
 	$("#login_signin").click(function() {
 		clear_flashes();
 		this.blur();
+		if ($('#login_username').val() == '' && $('#login_password').val() == '') {
+			$('#login_username').val('debug');
+			$('#login_password').val('password');
+		}
 		now.signIn($('#login_username').val(), $('#login_password').val(), function(result) {
 			handle_errors(result);
 			if (result.success) {
@@ -108,6 +118,9 @@ $(document).ready(function() {
 				setTimeout(function () {
 					$('#titlebox').remove();
 					layout_1col();
+					setTimeout(function() {
+						$('#log').width($('#log').width() + $('#log').width() - document.getElementById("log").scrollWidth + 5);
+					}, 1000);
 					$('#log').append('<div class="read">HINT: press Enter to open the prompt, type a command, and then press Enter again to send it.</div>');
 					$('#log').append('<div class="read">HINT: this is going to be an interactive fiction text adventure thing, but right now, for no good reason, the only command that does anything is "say."</div>');
 					$('#log').append('<div class="description">You stand in a dark, empty void, probably because isn\'t a world for this game to exist in yet. The obvious exits are... well, there aren\'t actually any obvious exits.</div>');
@@ -140,6 +153,12 @@ $(document).ready(function() {
 			}
 		});
 	});*/
+	
+	//$('#log').tinyscrollbar();
+	//$('#logwrapper').height($('#log').height());
+
+	// width of our wrapper equals width of the inner part of the textarea
+	//document.getElementById("logcontainer").style.width = document.getElementById("log").scrollWidth + 'px';
 	
 	
 	$("#login_register").click(function() {

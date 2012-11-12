@@ -98,7 +98,8 @@ State_input.prototype.update = function() {
 
 State_input.prototype.type_char = function(chr) {
 	this.buffer += chr;
-	$('#input-text').html(this.buffer);
+	var character = $('<span>').addClass('typedchar').html(chr);
+	character.appendTo('#input-text').hide().show('fast');
 }
 
 State_input.prototype.confirm = function() {
@@ -107,6 +108,7 @@ State_input.prototype.confirm = function() {
 		now.sendCommand(this.buffer);
 		var cmd= $('<div>').addClass('command').html('> ' + this.buffer);
 		cmd.appendTo('#log');
+		scroll_to_bottom_of_log();
 	}
 	Game.inputReady = false;
 	setTimeout(function() {
@@ -119,5 +121,7 @@ State_input.prototype.confirm = function() {
 State_input.prototype.delete_char = function() {
 	if (this.buffer == '') return;
 	this.buffer = this.buffer.substring(0, this.buffer.length - 1);
-	$('#input-text').html(this.buffer);
+	$($('#input-text>span.typedchar')[this.buffer.length]).removeClass('typedchar').hide('fast', function() {
+		$(this).remove();
+	});
 }
