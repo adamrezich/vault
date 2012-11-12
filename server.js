@@ -218,13 +218,75 @@ function Player(name) {
 
 function parse_command(player, command) {
 	var feedback = {};
+	
+	
+	var room = {};
+	room.items = [];
+	room.items.push({ name: 'flask' });
+	
+	
+	
+	
 	feedback.messages = [];
-	if (command.substring(0, 4) == "say ") {
+	/*if (command.substring(0, 4) == "say ") {
 		feedback.messages.push("You shout into the empty void and hope that someone else somewhere can hear you.");
 		everyone.now.distributeMessage(player, 'A distant voice shouts: "' + command.substring(4) + '"');
 	}
-	else feedback.messages.push("Unknown command. Because, y'know, there aren't any actual commands yet.");
-	//feedback.messages.push("We're testing multiple messages!");
+	else if (command == 'roguelike' || command == 'onecolumn' || command == 'onecolumnbasic') {
+		feedback.layout = command;
+	}
+	else feedback.messages.push("Unknown command. Because, y'know, there aren't any actual commands yet.");*/
+	
+	if (command == '') {
+		feedback.messages.push('You somehow managed to submit an empty command! Congratulations, I guess, but you didn\'t break the game or anything.');
+		return feedback;
+	}
+	
+	var split = command.split(' ');
+	var cmd = split.shift(); // I find this hilarious
+	var params = '';
+	if (split.length > 0) params = split.join(' ');
+	
+	for (var i = 0; i < commands.length; i++) {
+		var cmds = [];
+		if (Array.isArray(commands[i].verb)) cmds = commands[i].verb;
+		else cmds.push(commands[i].verb);
+		for (var j = 0; j < cmds.length; j++) {
+			if (cmd == cmds[j]) {
+				var cmdfeedback = commands[i].callback(params, player, room);
+				if (cmdfeedback.messages) feedback.messages = feedback.messages.concat(cmdfeedback.messages);
+				if (cmdfeedback.layout) feedback.layout = cmdfeedback.layout;
+				break;
+			}
+		}
+	}
+	
 	if (feedback.messages.length == 0) delete feedback.messages;
 	return feedback;
 }
+
+
+function Command(verb, callback) {
+	this.verb = verb;
+	this.callback = callback;
+}
+
+var commands = [];
+commands.push(new Command(['get', 'g', 'take', 'grab'], function(params, player, room) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	console.log(params);
+	
+	var found = false;
+	for (var i = 0; i < room.items.length; i++) {
+		if (room.items[i].name == params) {
+			feedback.messages.push('You take the ' + room.items[i].name + '.');
+			found = true;
+			break;
+		}
+	}
+	if (!found) feedback.messages.push('You see no such object in the room.');
+	
+	return feedback;
+}));

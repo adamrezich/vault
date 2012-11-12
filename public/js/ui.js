@@ -86,23 +86,21 @@ function scroll_to_bottom_of_log() {
 $(document).ready(function() {
 
 	now.receiveFeedback = function(feedback) {
+		$('#log>div').addClass('read');
 		if (feedback.messages) {
-			$('#log>div').addClass('read');
 			for (var m in feedback.messages) {
 				$("#log").append('<div>' + feedback.messages[m] + '</div>');
 				scroll_to_bottom_of_log();
 			}
+		}
+		if (feedback.layout) {
+			layout(feedback.layout);
 		}
 	}
 	
 	now.debug = function(message) {
 		flash(message);
 	}
-
-	/*$("#send-button").click(function() {
-		now.sendCommand($("#text-input").val());
-		$("#text-input").val("");
-	});*/
 
 	$("#login_signin").click(function() {
 		clear_flashes();
