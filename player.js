@@ -36,11 +36,11 @@ Player.load = function(data) {
 Player.prototype.save = function(callback) {
 	fs.writeFile(__dirname + '/data/players/' + this.name, JSON.stringify(this), function(err) {
 		if (err) {
-			callback(true);
+			callback(true, this);
 			return;
 		}
 		else {
-			callback(false);
+			callback(false, this);
 			return;
 		}
 	});
@@ -52,6 +52,7 @@ Player.prototype.move = function(direction, feedback) {
 		feedback = Room.list[this.room].describe(this, feedback);
 	}
 	else feedback.messages.push('That isn\'t a useful direction from here.');
+	feedback.save = true;
 	return feedback;
 }
 

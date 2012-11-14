@@ -52,6 +52,15 @@ Command.parse = function(player, command, callback) {
 	player.time.minute++;
 	feedback = player.time.get_time(feedback);
 	if (feedback.save) {
+		//console.log('Saving ' + player.name + '...');
+		player.save(function(err, player) {
+			if (err) {
+				console.log('!! ERROR SAVING ' + player.name + '!');
+			}
+			else {
+				//console.log('Saved ' + player.name + ' successfully.');
+			}
+		});
 	}
 	callback(feedback);
 }
@@ -169,15 +178,7 @@ Command.list.push(new Command('save', function(params, player) {
 	
 	feedback.messages.push('Saving...');
 	
-	//save_player(player, function(err) {
-	player.save(function(err) {
-		if (err) {
-			//feedback.messages.push('Something went super wrong in the wrong-zone.');
-		}
-		else {
-			//feedback.messages.push('Your game was saved successfully.');
-		}
-	});
+	feedback.save = true;
 	
 	return feedback;
 }));

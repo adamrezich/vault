@@ -147,6 +147,7 @@ $(document).ready(function() {
 					$('#titlebox').remove();
 					layout_1col();
 					setTimeout(function() {
+						layout('onecolumn');
 						$('#log').width($('#log').width() + $('#log').width() - document.getElementById("log").scrollWidth + 5);
 						now.sendCommand('look');
 					}, 1000);
