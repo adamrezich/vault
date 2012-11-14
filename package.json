@@ -1,0 +1,21 @@
+{
+  "name": "vault",
+  "version": "0.0.0",
+  "description": "an experimental game thing",
+  "main": "server.js",
+  "dependencies": {
+    "now": "~0.8.1",
+    "node.extend": "~1.0.0",
+    "validator": "~0.4.13"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/adamrezich/vault.git"
+  },
+  "author": "Adam Rezich"
+}

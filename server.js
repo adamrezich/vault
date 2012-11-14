@@ -115,7 +115,7 @@ everyone.now.signIn = function(username, password, callback) {
 					return;
 				}
 				else {
-					var p = JSON.parse(data);
+					var p = Player.load(JSON.parse(data));
 					if (crypto.createHash('sha1').update(password).digest('hex') == p.password) {
 						var found = false;
 						for (var i in activePlayers) {
@@ -194,7 +194,7 @@ everyone.now.signUp = function(username, password, confirm_password, callback) {
 			p.name = username;
 			p.password = crypto.createHash('sha1').update(password).digest('hex');
 			p.room = 'start';
-			save_player(p, function(err) {
+			p.save(function(err) {
 				if (err) {
 					callback({ error: 'Something went super wrong in the wrong-zone' });
 					return;
@@ -224,10 +224,22 @@ function Player(name) {
 	}
 }
 
-Player.load = function(name, callback) {
+Player.load = function(data) {
+	var p = new Player();
+	return extend(p, data);
 }
 
-Player.save = function(callback) {
+Player.prototype.save = function(callback) {
+	fs.writeFile(__dirname + '/data/players/' + this.name, JSON.stringify(this), function(err) {
+		if (err) {
+			callback(true);
+			return;
+		}
+		else {
+			callback(false);
+			return;
+		}
+	});
 }
 
 function parse_command(player, command) {
@@ -464,7 +476,8 @@ commands.push(new Command('save', function(params, player) {
 	
 	feedback.messages.push('Saving...');
 	
-	save_player(player, function(err) {
+	//save_player(player, function(err) {
+	player.save(function(err) {
 		if (err) {
 			//feedback.messages.push('Something went super wrong in the wrong-zone.');
 		}
