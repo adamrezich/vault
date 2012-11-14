@@ -3,6 +3,7 @@ var fs = require('fs');
 
 var Room = require('./room.js').Room;
 var Item = require('./item.js').Item;
+var Time = require('./time.js').Time;
 
 function Player(name) {
 	this.name = name;
@@ -14,9 +15,22 @@ function Player(name) {
 	}
 }
 
+Player.create = function(username, password) {
+	var p = new Player();
+	p.name = username;
+	p.password = password;
+	p.room = 'start';
+	p.time = new Time();
+	return p;
+}
+
 Player.load = function(data) {
 	var p = new Player();
-	return extend(p, data);
+	p = extend(p, data);
+	t = new Time();
+	t = extend(t, p.time);
+	p.time = t;
+	return p;
 }
 
 Player.prototype.save = function(callback) {
@@ -35,7 +49,7 @@ Player.prototype.save = function(callback) {
 Player.prototype.move = function(direction, feedback) {
 	if (Room.list[this.room].nav[direction]) {
 		this.room = Room.list[this.room].nav[direction];
-		feedback.messages = Room.list[this.room].describe(this, feedback.messages)
+		feedback = Room.list[this.room].describe(this, feedback);
 	}
 	else feedback.messages.push('That isn\'t a useful direction from here.');
 	return feedback;

@@ -106,7 +106,6 @@ State_input.prototype.confirm = function() {
 	Game.inputReady = false;
 	$('#input-text>span').animate({ opacity: 0 }, 200, function() { $(this).remove(); });
 	setTimeout(function() {
-		//$('#input-text').html('');
 		Game.inputReady = true;
 	}, 200);
 	if (this.buffer != "") {

@@ -93,8 +93,38 @@ $(document).ready(function() {
 				scroll_to_bottom_of_log();
 			}
 		}
+		if (feedback.place) {
+			console.log(feedback);
+			if (feedback.place.small) {
+				$('#smallplace').html(feedback.place.small);
+				$('#smallplace').stop().show('fast');
+				$('#bigplace').stop().animate({ top: '25px' }, 'fast');
+			}
+			else {
+				$('#smallplace').stop().hide('fast', function() { $(this).html(''); });
+				$('#bigplace').stop().animate({ top: '18px' }, 'fast');
+			}
+			if (feedback.place.big) $('#bigplace').html(feedback.place.big);
+			else $('#bigplace').html('');
+		}
 		if (feedback.layout) {
 			layout(feedback.layout);
+		}
+		if (feedback.time) {
+			if (feedback.time.month || feedback.time.month == 0) $('#month').html(months[feedback.time.month]);
+			if (feedback.time.day) $('#day').html(feedback.time.day);
+			if (feedback.time.hour || feedback.time.hour == 0) {
+				var hr = feedback.time.hour;
+				if (hr > 12) hr = hr - 12;
+				if (hr == 0) hr = 12;
+				hr = hr.toString();
+				if (hr.length == 1) hr = '0' + hr;
+				
+				var mn = feedback.time.minute.toString();
+				if (mn.length == 1) mn = '0' + mn;
+				
+				$('#time').html(hr + ':' + mn);
+			}
 		}
 	}
 	

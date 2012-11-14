@@ -1,6 +1,9 @@
+var extend = require('node.extend');
+
 var Room = require('./room.js').Room;
 var Item = require('./item.js').Item;
 var Player = require('./player.js').Player;
+var Time = require('./time.js').Time;
 
 function Command(verb, callback) {
 	this.verb = verb;
@@ -38,8 +41,7 @@ Command.parse = function(player, command, callback) {
 			if (cmd == cmds[j].toLowerCase()) {
 				found = true;
 				var cmdfeedback = Command.list[i].callback(params, player);
-				if (cmdfeedback.messages) feedback.messages = feedback.messages.concat(cmdfeedback.messages);
-				if (cmdfeedback.layout) feedback.layout = cmdfeedback.layout;
+				feedback = extend(feedback, cmdfeedback);
 				break;
 			}
 		}
@@ -47,6 +49,10 @@ Command.parse = function(player, command, callback) {
 	if (!found) feedback.messages.push('Command not understood. Type HELP for a list of commands.');
 	
 	if (feedback.messages.length == 0) delete feedback.messages;
+	player.time.minute++;
+	feedback = player.time.get_time(feedback);
+	if (feedback.save) {
+	}
 	callback(feedback);
 }
 
@@ -82,7 +88,7 @@ Command.list.push(new Command(['look', 'l'], function(params, player) {
 	var feedback = {};
 	feedback.messages = [];
 	
-	feedback.messages = Room.list[player.room].describe(player, feedback.messages);
+	feedback = Room.list[player.room].describe(player, feedback);
 	
 	return feedback;
 }));

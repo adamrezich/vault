@@ -11,6 +11,8 @@ var Player = require('./player.js').Player;
 var Room = require('./room.js').Room;
 var Item = require('./item.js').Item;
 var Command = require('./command.js').Command;
+var Area = require('./area.js').Area;
+var Time = require('./time.js').Time;
 
 var Validator = require('validator').Validator;
 Validator.prototype.error = function(msg) {
@@ -194,10 +196,7 @@ everyone.now.signUp = function(username, password, confirm_password, callback) {
 			return;
 		}
 		else {
-			var p = new Player();
-			p.name = username;
-			p.password = crypto.createHash('sha1').update(password).digest('hex');
-			p.room = 'start';
+			var p = Player.create(username, crypto.createHash('sha1').update(password).digest('hex'));
 			p.save(function(err) {
 				if (err) {
 					callback({ error: 'Something went super wrong in the wrong-zone' });
@@ -217,5 +216,3 @@ everyone.now.playerExists = function(username, callback) {
 		callback(exists);
 	});
 }
-
-

@@ -52,7 +52,6 @@ Game.update = function() {
 	Key.update();
 };
 
-
 $(document).ready(function() {
 	Game.start();
 });
@@ -62,3 +61,5 @@ $(window).bind('focus', function() {
 $(window).bind('blur', function() {
 	for (prop in Key._pressed) { if (Key._pressed.hasOwnProperty(prop)) { delete Key._pressed[prop]; } }
 });
+
+var months = ["Jan", "Feb", "March", "April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec"];
