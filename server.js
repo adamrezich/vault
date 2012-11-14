@@ -5,6 +5,7 @@ var util = require('util');
 var shasum = crypto.createHash('sha1');
 var check = require('validator').check;
 var sanitize = require('validator').sanitize;
+var extend = require('node.extend');
 
 var Validator = require('validator').Validator;
 Validator.prototype.error = function(msg) {
@@ -193,7 +194,7 @@ everyone.now.signUp = function(username, password, confirm_password, callback) {
 			p.name = username;
 			p.password = crypto.createHash('sha1').update(password).digest('hex');
 			p.room = 'start';
-			fs.writeFile(__dirname + '/data/players/' + username, JSON.stringify(p), function(err) {
+			save_player(p, function(err) {
 				if (err) {
 					callback({ error: 'Something went super wrong in the wrong-zone' });
 					return;
@@ -216,6 +217,17 @@ everyone.now.playerExists = function(username, callback) {
 function Player(name) {
 	this.name = name;
 	this.room = 'test1';
+	this.roomdata = {};
+	for (var i = 0; i < Object.keys(rooms).length; i++) {
+		this.roomdata[Object.keys(rooms)[i]] = {};
+		this.roomdata[Object.keys(rooms)[i]].items = rooms[Object.keys(rooms)[i]].items;
+	}
+}
+
+Player.load = function(name, callback) {
+}
+
+Player.save = function(callback) {
 }
 
 function parse_command(player, command) {
@@ -236,9 +248,9 @@ function parse_command(player, command) {
 	}
 	
 	var split = command.split(' ');
-	var cmd = split.shift(); // I find this hilarious
+	var cmd = split.shift().toLowerCase(); // I find this hilarious
 	var params = '';
-	if (split.length > 0) params = split.join(' ');
+	if (split.length > 0) params = split.join(' ').toLowerCase();
 	
 	var found = false;
 	for (var i = 0; i < commands.length; i++) {
@@ -246,7 +258,7 @@ function parse_command(player, command) {
 		if (Array.isArray(commands[i].verb)) cmds = commands[i].verb;
 		else cmds.push(commands[i].verb);
 		for (var j = 0; j < cmds.length; j++) {
-			if (cmd == cmds[j]) {
+			if (cmd == cmds[j].toLowerCase()) {
 				found = true;
 				var cmdfeedback = commands[i].callback(params, player);
 				if (cmdfeedback.messages) feedback.messages = feedback.messages.concat(cmdfeedback.messages);
@@ -265,28 +277,47 @@ function Item(name) {
 	this.name = name;
 }
 
-function Room(name, description, nav, items) {
+function Room(internalName, name, description, nav, items) {
+	this.internalName = internalName;
 	this.name = name;
 	this.description = description;
 	this.nav = nav;
 	this.items = items;
 }
 
-Room.prototype.describe = function(messages) {
+Room.prototype.describe = function(player, messages) {
 	messages.push('_' + this.name);
 	messages.push(this.description);
+	var items = [];
+	if (player.roomdata[this.internalName].items) {
+		for (var i = 0; i < player.roomdata[this.internalName].items.length; i++) {
+			items.push(player.roomdata[this.internalName].items[i].name);
+		}
+		if (items.length > 0) {
+			var itemstr = 'There is ';
+			for (var i = 0; i < items.length; i++) {
+				itemstr += 'a ' + items[i] + ', '
+			}
+			messages.push(itemstr.replace(/\s+$/,''));
+		}
+	}
 	return messages;
 }
 
 var rooms = {};
 rooms['start'] = new Room(
+	'start',
 	'Test Room One',
 	'The room is oddly empty, almost as though it is a debug room created solely for the purpose of testing a game engine or something. There is a doorway to the north.',
 	{
 		n: 'test2'
-	}
+	},
+	[
+		new Item('flask')
+	]
 );
 rooms['test2'] = new Room(
+	'test2',
 	'Test Room Two',
 	'Like the room to the south, this room is indescribably devoid of content. There is a doorway to the south.',
 	{
@@ -297,10 +328,23 @@ rooms['test2'] = new Room(
 function move(player, direction, feedback) {
 	if (rooms[player.room].nav[direction]) {
 		player.room = rooms[player.room].nav[direction];
-		feedback.messages = rooms[player.room].describe(feedback.messages)
+		feedback.messages = rooms[player.room].describe(player, feedback.messages)
 	}
 	else feedback.messages.push('That isn\'t a useful direction from here.');
 	return feedback;
+}
+
+function save_player(player, callback) {
+	fs.writeFile(__dirname + '/data/players/' + player.name, JSON.stringify(player), function(err) {
+		if (err) {
+			callback(true);
+			return;
+		}
+		else {
+			callback(false);
+			return;
+		}
+	});
 }
 
 function Command(verb, callback) {
@@ -318,15 +362,15 @@ commands.push(new Command(['get', 'g', 'take', 'grab'], function(params, player)
 		return feedback;
 	}
 	
-	if (!rooms[player.room].items) {
+	if (!player.roomdata[player.room].items) {
 		feedback.messages.push('You see no such object in the room.');
 		return feedback;
 	}
 	
 	var found = false;
-	for (var i = 0; i < rooms[player.room].items.length; i++) {
-		if (rooms[player.room].items[i].name == params) {
-			feedback.messages.push('You take the ' + rooms[player.room].items[i].name + '.');
+	for (var i = 0; i < player.roomdata[player.room].items.length; i++) {
+		if (player.roomdata[player.room].items[i].name == params) {
+			feedback.messages.push('You take the ' + player.roomdata[player.room].items[i].name + '.');
 			found = true;
 			break;
 		}
@@ -339,7 +383,7 @@ commands.push(new Command(['look', 'l'], function(params, player) {
 	var feedback = {};
 	feedback.messages = [];
 	
-	feedback.messages = rooms[player.room].describe(feedback.messages);
+	feedback.messages = rooms[player.room].describe(player, feedback.messages);
 	
 	return feedback;
 }));
@@ -396,6 +440,38 @@ commands.push(new Command(['help', 'h'], function(params, player) {
 	feedback.messages = [];
 	
 	feedback.messages.push('Sorry, there isn\'t a HELP list yet.');
+	
+	return feedback;
+}));
+commands.push(new Command(['go', 'head', 'walk'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	var dir = params;
+	if (['n', 'north', 's', 'south', 'e', 'east', 'w', 'west', 'u', 'up', 'd', 'down'].indexOf(dir) == -1) {
+		feedback.messages.push('Unrecognized direction.');
+		return feedback;
+	}
+	dir = dir.charAt(0);
+	
+	feedback = move(player, dir, feedback);
+	
+	return feedback;
+}));
+commands.push(new Command('save', function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	feedback.messages.push('Saving...');
+	
+	save_player(player, function(err) {
+		if (err) {
+			//feedback.messages.push('Something went super wrong in the wrong-zone.');
+		}
+		else {
+			//feedback.messages.push('Your game was saved successfully.');
+		}
+	});
 	
 	return feedback;
 }));

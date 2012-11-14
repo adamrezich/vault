@@ -103,19 +103,23 @@ State_input.prototype.type_char = function(chr) {
 }
 
 State_input.prototype.confirm = function() {
-	$('#inputcontainer').removeClass();
+	Game.inputReady = false;
+	$('#input-text>span').animate({ opacity: 0 }, 200, function() { $(this).remove(); });
+	setTimeout(function() {
+		//$('#input-text').html('');
+		Game.inputReady = true;
+	}, 200);
 	if (this.buffer != "") {
 		now.sendCommand(this.buffer);
 		var cmd= $('<div>').addClass('command').html('> ' + this.buffer);
 		cmd.appendTo('#log');
 		scroll_to_bottom_of_log();
+		this.buffer = '';
 	}
-	Game.inputReady = false;
-	setTimeout(function() {
-		$('#input-text').html('');
-		Game.inputReady = true;
-	}, 200);
-	State.pop();
+	else {
+		$('#inputcontainer').removeClass();
+		State.pop();
+	}
 }
 
 State_input.prototype.delete_char = function() {

@@ -52,7 +52,7 @@ body {
 }
 
 #container {
-	background: rgba(34, 34, 34, 1) url('../images/960x720.png');
+	background: rgba(34, 34, 34, 1);/*url('../images/960x720.png');*/
 	margin-left: auto;
 	margin-right: auto;
 	width: 960px;
@@ -281,9 +281,9 @@ body {
 
 #inputcontainer > #input {
 	position: absolute;
-	top: 5px;
-	left: 5px;
-	right: 5px;
+	top: 12px;
+	left: 12px;
+	right: 11px;
 	padding: 2px 5px;
 	font-size: 24px;
 	background: rgba(85, 85, 85, 0.5);
@@ -314,7 +314,7 @@ body {
 
 #inputcontainer > #prompt {
 	position: absolute;
-	top: 5px;
+	top: 14px;
 	left: 5px;
 	padding: 2px 5px;
 	font-size: 24px;
