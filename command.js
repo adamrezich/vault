@@ -77,7 +77,7 @@ Command.list.push(new Command(['get', 'g', 'take', 'grab'], function(params, pla
 	}
 	
 	if (!player.roomdata[player.room].items) {
-		feedback.messages.push('You see no such object in the room.');
+		feedback.messages.push('You see no such object here');
 		return feedback;
 	}
 	
@@ -89,7 +89,32 @@ Command.list.push(new Command(['get', 'g', 'take', 'grab'], function(params, pla
 			break;
 		}
 	}
-	if (!found) feedback.messages.push('You see no such object in the room.');
+	if (!found) feedback.messages.push('You see no such object here.');
+	
+	return feedback;
+}));
+Command.list.push(new Command(['examine', 'x'], function(params, player) {
+	var feedback = {};
+	feedback.messages = [];
+	
+	var items = [];
+	
+	items = items.concat((player.roomdata[player.room].items ? player.roomdata[player.room].items : []), player.inventory);
+	
+	var found = false;
+	for (var i = 0; i < items.length; i++) {
+		if (params == items[i].name) {
+			console.log(items[i]);
+			if (items[i].events.examine) {
+				feedback = items[i].events.examine(player, items[i], feedback);
+				console.log(feedback);
+			}
+			if (!feedback.override_default) feedback.messages.push((items[i].description ? items[i].description : 'Just a nondescript thing.'));
+			found = true;
+			break;
+		}
+	}
+	if (!found) feedback.messages.push('You see no such object here.');
 	
 	return feedback;
 }));

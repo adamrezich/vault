@@ -8,6 +8,7 @@ var Time = require('./time.js').Time;
 function Player(name) {
 	this.name = name;
 	this.room = 'test1';
+	this.inventory = [];
 	this.roomdata = {};
 	for (var i = 0; i < Object.keys(Room.list).length; i++) {
 		this.roomdata[Object.keys(Room.list)[i]] = {};
