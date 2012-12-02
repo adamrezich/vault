@@ -105,11 +105,11 @@ Command.list.push(new Command(['examine', 'x'], function(params, player) {
 	for (var i = 0; i < items.length; i++) {
 		if (params == items[i].name) {
 			console.log(items[i]);
-			if (items[i].events.examine) {
+			/*if (items[i].events.examine) {
 				feedback = items[i].events.examine(player, items[i], feedback);
 				console.log(feedback);
 			}
-			if (!feedback.override_default) feedback.messages.push((items[i].description ? items[i].description : 'Just a nondescript thing.'));
+			if (!feedback.override_default) */feedback.messages.push((items[i].description ? items[i].description : 'Just a nondescript thing.'));
 			found = true;
 			break;
 		}

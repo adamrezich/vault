@@ -57,19 +57,7 @@ Room.push(new Room(
 		n: 'test2'
 	},
 	[
-		new Item('flask'),
-		new Item(
-			'watch',
-			"You'll never see this because the 'examine' event should override it!",
-			{
-				butt: 5,
-				examine: function(player, item, feedback) {
-					feedback.messages.push("A digital wristwatch you've had like forever. You'd wear it on your wrist but you can't because the game engine isn't that cool yet. Its time display reads: [THE TIME WOULD GO HERE IF I WASN'T SUPER LAZY].");
-					feedback.override_default = true;
-					return feedback;
-				}
-			}
-		)
+		new Item('flask', "Y'know, just a flask or whatever. Shut up.")
 	]
 ));
 Room.push(new Room(
