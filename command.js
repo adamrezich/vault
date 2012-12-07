@@ -83,8 +83,8 @@ Command.list.push(new Command(['get', 'g', 'take', 'grab'], function(params, pla
 	
 	var found = false;
 	for (var i = 0; i < player.roomdata[player.room].items.length; i++) {
-		if (player.roomdata[player.room].items[i].name == params) {
-			feedback.messages.push('You take the ' + player.roomdata[player.room].items[i].name + '.');
+		if (Item.Data[player.roomdata[player.room].items[i].name].name == params) {
+			feedback.messages.push('You take the ' + Item.Data[player.roomdata[player.room].items[i].name].name + '.');
 			found = true;
 			break;
 		}
@@ -109,7 +109,7 @@ Command.list.push(new Command(['examine', 'x'], function(params, player) {
 				feedback = items[i].events.examine(player, items[i], feedback);
 				console.log(feedback);
 			}
-			if (!feedback.override_default) */feedback.messages.push((items[i].description ? items[i].description : 'Just a nondescript thing.'));
+			if (!feedback.override_default) */feedback.messages.push((Item.Data[items[i].name].description ? Item.Data[items[i].name].description : 'Just a nondescript thing.'));
 			found = true;
 			break;
 		}

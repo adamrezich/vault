@@ -1,13 +1,13 @@
-function Item(name, description, events) {
+function Item(name, data) {
 	this.name = name;
-	this.description = description;
-	this.events = events;
+	this.data = data;
 }
 
-function SimpleItem(name, description, properties) {
-	this.name = name;
-	this.description = description;
-	this.properties = properties;
-}
+Item.Data = {
+	"flask": {
+		name: "flask",
+		description: "Just a flask or whatever, shut up."
+	}
+};
 
 exports.Item = Item;

@@ -7,6 +7,13 @@ var check = require('validator').check;
 var sanitize = require('validator').sanitize;
 var extend = require('node.extend');
 
+var S = require('./stringhelper.js').StringHelper;
+var test = ['poop', 'butt', 'weiner'];
+for (var i = 0; i < test.length; i++) {
+	test[i] = S.indefiniteArticle(test[i]) + ' ' + test[i];
+}
+console.log(S.toSentence(test));
+
 var Player = require('./player.js').Player;
 var Room = require('./room.js').Room;
 var Item = require('./item.js').Item;

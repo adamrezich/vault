@@ -1,3 +1,5 @@
+var S = require('./stringhelper.js').StringHelper;
+
 var Item = require('./item.js').Item;
 var Area = require('./area.js').Area;
 var Time = require('./time.js').Time;
@@ -23,13 +25,14 @@ Room.prototype.describe = function(player, feedback) {
 	var items = [];
 	if (player.roomdata[this.internalName].items) {
 		for (var i = 0; i < player.roomdata[this.internalName].items.length; i++) {
-			items.push(player.roomdata[this.internalName].items[i].name);
+			items.push(Item.Data[player.roomdata[this.internalName].items[i].name].name);
 		}
 		if (items.length > 0) {
 			var itemstr = 'There is ';
 			for (var i = 0; i < items.length; i++) {
-				itemstr += 'a ' + items[i] + ', '
+				items[i] = S.indefiniteArticle(items[i]) + ' ' + items[i];
 			}
+			itemstr += S.toSentence(items) + ' here.';
 			feedback.messages.push(itemstr.replace(/\s+$/,''));
 		}
 	}
@@ -57,7 +60,7 @@ Room.push(new Room(
 		n: 'test2'
 	},
 	[
-		new Item('flask', "Y'know, just a flask or whatever. Shut up.")
+		new Item('flask')
 	]
 ));
 Room.push(new Room(
